@@ -80,6 +80,8 @@ import com.sun.jersey.spi.container.servlet.ServletContainer;
 public class EurekaServerAutoConfiguration extends WebMvcConfigurerAdapter {
 	/**
 	 * List of packages containing Jersey resources required by the Eureka server
+	 *
+	 * 包含Eureka服务器所需的Jersey资源的软件包列表
 	 */
 	private static final String[] EUREKA_PACKAGES = new String[] { "com.netflix.discovery",
 			"com.netflix.eureka" };
@@ -113,8 +115,10 @@ public class EurekaServerAutoConfiguration extends WebMvcConfigurerAdapter {
 		@ConditionalOnMissingBean
 		public EurekaServerConfig eurekaServerConfig(EurekaClientConfig clientConfig) {
 			EurekaServerConfigBean server = new EurekaServerConfigBean();
+			// 在某些情况下，您不希望发现您的实例，而您只是想要发现其他实例。
 			if (clientConfig.shouldRegisterWithEureka()) {
 				// Set a sensible default if we are supposed to replicate
+				// 如果我们应该复制，设置合理的默认值
 				server.setRegistrySyncRetries(5);
 			}
 			return server;
@@ -124,6 +128,7 @@ public class EurekaServerAutoConfiguration extends WebMvcConfigurerAdapter {
 	@Bean
 	@ConditionalOnProperty(prefix = "eureka.dashboard", name = "enabled", matchIfMissing = true)
 	public EurekaController eurekaController() {
+		// eurekaController
 		return new EurekaController(this.applicationInfoManager);
 	}
 
@@ -179,6 +184,9 @@ public class EurekaServerAutoConfiguration extends WebMvcConfigurerAdapter {
 	/**
 	 * {@link PeerEurekaNodes} which updates peers when /refresh is invoked.
 	 * Peers are updated only if
+	 *
+	 * {@link PeerEurekaNodes}在调用/ refresh时更新对等体。 只有在更新时才会更新对等方
+	 *
 	 * <code>eureka.client.use-dns-for-fetching-service-urls</code> is
 	 * <code>false</code> and one of following properties have changed.
 	 * </p>
@@ -209,12 +217,17 @@ public class EurekaServerAutoConfiguration extends WebMvcConfigurerAdapter {
 		
 		/*
 		 * Check whether specific properties have changed.
+		 *
+		 * 检查特定属性是否已更改。
 		 */
 		protected boolean shouldUpdate(final Set<String> changedKeys) {
 			assert changedKeys != null;
 			
 			// if eureka.client.use-dns-for-fetching-service-urls is true, then
 			// service-url will not be fetched from environment.
+
+			// 如果eureka.client.use-dns-for-fetching-service-urls为true，那么
+			// 不会从环境中获取service-url。
 			if (clientConfig.shouldUseDnsForFetchingServiceUrls()) {
 				return false;
 			}
@@ -225,6 +238,7 @@ public class EurekaServerAutoConfiguration extends WebMvcConfigurerAdapter {
 			
 			for (final String key : changedKeys) {
 				// property keys are not expected to be null.
+				// 属性键不应为null。
 				if (key.startsWith("eureka.client.service-url.") ||
 					key.startsWith("eureka.client.availability-zones.")) {
 					return true;
@@ -268,6 +282,8 @@ public class EurekaServerAutoConfiguration extends WebMvcConfigurerAdapter {
 	/**
 	 * Construct a Jersey {@link javax.ws.rs.core.Application} with all the resources
 	 * required by the Eureka server.
+	 *
+	 * 使用Eureka服务器所需的所有资源构建Jersey {@link javax.ws.rs.core.Application}。
 	 */
 	@Bean
 	public javax.ws.rs.core.Application jerseyApplication(Environment environment,
@@ -277,12 +293,12 @@ public class EurekaServerAutoConfiguration extends WebMvcConfigurerAdapter {
 				false, environment);
 
 		// Filter to include only classes that have a particular annotation.
-		//
+		// 过滤以仅包含具有特定注释的类。
 		provider.addIncludeFilter(new AnnotationTypeFilter(Path.class));
 		provider.addIncludeFilter(new AnnotationTypeFilter(Provider.class));
 
 		// Find classes in Eureka packages (or subpackages)
-		//
+		// 在Eureka包（或子包）中查找类
 		Set<Class<?>> classes = new HashSet<>();
 		for (String basePackage : EUREKA_PACKAGES) {
 			Set<BeanDefinition> beans = provider.findCandidateComponents(basePackage);
@@ -294,10 +310,11 @@ public class EurekaServerAutoConfiguration extends WebMvcConfigurerAdapter {
 		}
 
 		// Construct the Jersey ResourceConfig
-		//
+		// 构建Jersey ResourceConfig
 		Map<String, Object> propsAndFeatures = new HashMap<>();
 		propsAndFeatures.put(
 				// Skip static content used by the webapp
+				// 跳过webapp使用的静态内容
 				ServletContainer.PROPERTY_WEB_PAGE_CONTENT_REGEX,
 				EurekaConstants.DEFAULT_PREFIX + "/(fonts|images|css|js)/.*");
 

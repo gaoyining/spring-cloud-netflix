@@ -79,7 +79,11 @@ public class EurekaServerBootstrap {
 
 	public void contextInitialized(ServletContext context) {
 		try {
+			// ------------------关键方法------------------
+			// 初始化eureka环境变量
 			initEurekaEnvironment();
+			// ------------------关键方法------------------
+			// 初始化eureka ServerContext
 			initEurekaServerContext();
 
 			context.setAttribute(EurekaServerContext.class.getName(), this.serverContext);
@@ -106,11 +110,13 @@ public class EurekaServerBootstrap {
 	}
 
 	protected void initEurekaEnvironment() throws Exception {
+		// 设置eureka配置
 		log.info("Setting the eureka configuration..");
 
 		String dataCenter = ConfigurationManager.getConfigInstance()
 				.getString(EUREKA_DATACENTER);
 		if (dataCenter == null) {
+			// 未设置Eureka数据中心值eureka.datacenter，默认为默认值
 			log.info(
 					"Eureka data center value eureka.datacenter is not set, defaulting to default");
 			ConfigurationManager.getConfigInstance()
@@ -125,6 +131,7 @@ public class EurekaServerBootstrap {
 		if (environment == null) {
 			ConfigurationManager.getConfigInstance()
 					.setProperty(ARCHAIUS_DEPLOYMENT_ENVIRONMENT, TEST);
+			// Eureka环境值eureka.environment未设置，默认为测试
 			log.info(
 					"Eureka environment value eureka.environment is not set, defaulting to test");
 		}
@@ -136,6 +143,7 @@ public class EurekaServerBootstrap {
 
 	protected void initEurekaServerContext() throws Exception {
 		// For backward compatibility
+		// 为了向后兼容
 		JsonXStream.getInstance().registerConverter(new V1AwareInstanceInfoConverter(),
 				XStream.PRIORITY_VERY_HIGH);
 		XmlXStream.getInstance().registerConverter(new V1AwareInstanceInfoConverter(),
