@@ -32,6 +32,8 @@ import com.netflix.discovery.EurekaClient;
 /**
  * Extra configuration for config server if it happens to be a Eureka instance.
  *
+ * 配置服务器的额外配置（如果恰好是Eureka实例）。
+ *
  * @author Dave Syer
  */
 @Configuration

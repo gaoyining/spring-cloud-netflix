@@ -30,6 +30,8 @@ import com.netflix.discovery.EurekaClient;
  * Bootstrap configuration for a config client that wants to lookup the config server via
  * discovery.
  *
+ * 想要通过发现查找配置服务器的配置客户端的引导配置。
+ *
  * @author Dave Syer
  */
 @ConditionalOnBean({ EurekaDiscoveryClientConfiguration.class })
